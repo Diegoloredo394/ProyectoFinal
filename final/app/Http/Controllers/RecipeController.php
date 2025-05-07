@@ -26,7 +26,9 @@ class RecipeController extends Controller
      */
     public function create()
     {
-        //
+        // Solo admin
+        abort_if(auth()->user()->role !== 'admin', 403);
+        return view('recipes.create');
     }
 
     /**
@@ -34,7 +36,19 @@ class RecipeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        abort_if(auth()->user()->role !== 'admin', 403);
+    
+        $data = $request->validate([
+          'name'        => 'required|string|max:255',
+          'description' => 'nullable|string',
+          'steps'       => 'nullable|string',
+        ]);
+    
+        Recipe::create($data);
+    
+        return redirect()
+              ->route('recipes.index')
+              ->with('success','Receta creada correctamente.');
     }
 
     /**
