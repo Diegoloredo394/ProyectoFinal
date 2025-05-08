@@ -96,27 +96,38 @@ class RecipeController extends Controller
     public function update(Request $request, Recipe $recipe)
     {
         //
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'steps' => 'required|string',
-        ]);
-    
-        $recipe->update($request->only('name', 'description', 'steps'));
+        abort_if(auth()->user()->role !== 'admin', 403);
 
-        if (isset($data['ingredients'])) {
-            $syncData = [];
-            foreach ($data['ingredients'] as $ing) {
-                $syncData[$ing['id']] = [
-                    'quantity' => $ing['quantity'],
-                    'unit' => $ing['unit'],
-                ];
-            }
-            $recipe->ingredients()->sync($syncData);
+        $data = $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'steps'       => 'nullable|string',
+            'ingredients' => 'nullable|array',
+            'ingredients.*.name'     => 'required|string|max:255',
+            'ingredients.*.quantity' => 'required|numeric|min:0',
+            'ingredients.*.unit'     => 'required|string|max:10',
+        ]);
+
+        $recipe->update([
+            'name'        => $data['name'],
+            'description' => $data['description'] ?? '',
+            'steps'       => $data['steps'] ?? '',
+        ]);
+
+        // Sincronizar ingredientes
+        $syncData = [];
+        foreach ($data['ingredients'] ?? [] as $ing) {
+            $ingredient = Ingredient::firstOrCreate(['name' => $ing['name']]);
+            $syncData[$ingredient->id] = [
+                'quantity' => $ing['quantity'],
+                'unit'     => $ing['unit'],
+            ];
         }
-  
-    
-        return redirect()->route('recipes.show', $recipe)->with('success', 'Receta actualizada.');
+        $recipe->ingredients()->sync($syncData);
+
+        return redirect()
+            ->route('recipes.show', $recipe)
+            ->with('success', 'Receta actualizada correctamente.');
     }
 
     /**
