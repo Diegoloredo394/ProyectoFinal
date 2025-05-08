@@ -25,6 +25,16 @@
           <textarea name="steps" rows="5"
                     class="mt-1 block w-full border-gray-300 rounded">{{ old('steps') }}</textarea>
         </div>
+
+        <h4>Ingredientes</h4>
+        <div id="ingredients">
+          <div class="ingredient-group">
+            <input type="text" name="ingredients[0][name]" placeholder="Nombre del ingrediente" class="border rounded px-2 py-1">
+            <input type="number" name="ingredients[0][quantity]" placeholder="Cantidad" class="border rounded px-2 py-1">
+            <input type="text" name="ingredients[0][unit]" placeholder="Unidad (g, ml, u...)" class="border rounded px-2 py-1">
+          </div>
+        </div>
+        <button type="button" onclick="addIngredient()" class="mt-2 px-4 py-2 bg-green-500 text-white rounded">Agregar otro ingrediente</button>
   
         <div class="text-right">
           <button type="submit"
@@ -32,6 +42,22 @@
             Guardar Receta
           </button>
         </div>
+
+        <script>
+          let ingredientIndex = 1;
+          function addIngredient() {
+            const container = document.getElementById('ingredients');
+            const newGroup = document.createElement('div');
+            newGroup.classList.add('ingredient-group', 'mt-2');
+            newGroup.innerHTML = `
+              <input type="text" name="ingredients[${ingredientIndex}][name]" placeholder="Nombre del ingrediente" class="border rounded px-2 py-1">
+              <input type="number" name="ingredients[${ingredientIndex}][quantity]" placeholder="Cantidad" class="border rounded px-2 py-1">
+              <input type="text" name="ingredients[${ingredientIndex}][unit]" placeholder="Unidad (g, ml, u...)" class="border rounded px-2 py-1">
+            `;
+            container.appendChild(newGroup);
+            ingredientIndex++;
+          }
+        </script>
       </form>
     </div>
   

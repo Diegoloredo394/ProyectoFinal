@@ -6,7 +6,7 @@
     <div class="p-4">
       <!-- Botón para crear nueva receta -->
       <a href="{{ route('recipes.create') }}"
-         class="inline-block mb-4 px-4 py-2 bg-temu-900 text-white rounded hover:bg-temu-800">
+         class="inline-block mb-4 px-4 py-2 bg-green-900 text-white rounded hover:bg-green-800">
         Nueva Receta
       </a>
   
@@ -19,7 +19,7 @@
               {{ Str::limit($recipe->description, 100) }}
             </p>
             <a href="{{ route('recipes.show', $recipe) }}"
-               class="mt-2 inline-block text-temu-900 hover:underline">
+               class="mt-2 inline-block text-temu-900 hover:underline hover:text-green-800">
               Ver detalles
             </a>
           </div>
