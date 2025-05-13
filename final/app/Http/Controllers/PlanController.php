@@ -5,76 +5,144 @@ namespace App\Http\Controllers;
 use App\Models\Plan;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
+
 
 class PlanController extends Controller
 {
-    // Listado para el miembro
-    public function index()
-    {
-        if (auth()->user()->role !== 'member') {
-            abort(403);
-        }
-        $plans = auth()->user()->plans()->with('recipes')->get();
-        return view('plans.index', compact('plans'));
-    }
-
-    // Mostrar formulario de creación (solo admin)
+    // 1. Formulario de creación (solo admin)
     public function create()
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        abort_if(auth()->user()->role !== 'admin', 403);
+
         $recipes = Recipe::all();
         return view('plans.create', compact('recipes'));
     }
 
-    // Guardar nuevo plan (admin)
+    // 2. Guardar nuevo plan (solo admin)
     public function store(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        abort_if(auth()->user()->role !== 'admin', 403);
+
         $data = $request->validate([
-            'user_id'    => 'required|exists:users,id',
             'start_date' => 'required|date',
             'end_date'   => 'required|date|after_or_equal:start_date',
-            'recipes'    => 'array', // ids de recetas
+            'recipes'    => 'array',
+            'recipes.*'  => 'array',
+            'recipes.*.*'=> 'integer|exists:recipes,id',
         ]);
 
-        $plan = Plan::create($data);
-        if (!empty($data['recipes'])) {
-            // day_of_week vendrá junto en request, p.ej. recipes[Mon] = [1,2]
-            foreach ($data['recipes'] as $day => $ids) {
-                foreach ($ids as $rid) {
-                    $plan->recipes()->attach($rid, ['day_of_week' => $day]);
-                }
+        $plan = Plan::create([
+            'user_id'    => auth()->id(), // asumimos que el admin crea planes para sí
+            'name'       => 'Plan '.$data['start_date'].' - '.$data['end_date'],
+            'start_date' => $data['start_date'],
+            'end_date'   => $data['end_date'],
+        ]);
+
+        foreach ($data['recipes'] as $day => $ids) {
+            foreach ($ids as $rid) {
+                $plan->recipes()->attach($rid, ['day_of_week' => $day]);
             }
         }
 
-        return redirect()->route('plans.index')
-                         ->with('success','Plan creado correctamente');
+        return redirect()
+            ->route('plans.index')
+            ->with('success','Plan creado correctamente');
     }
 
-    // Para miembros o admin, ver un plan concreto
+    // 3. Listado de planes (admin y member)
+    public function index()
+    {
+        if (auth()->user()->role === 'member') {
+            // solo sus propios planes
+            $plans = auth()->user()->plans()->with('recipes')->get();
+        } else {
+            // admin ve todos
+            $plans = Plan::with('recipes','user')->get();
+        }
+
+        return view('plans.index', compact('plans'));
+    }
+
+    // 4. Detalle de un plan
     public function show(Plan $plan)
     {
-        if (
-            auth()->user()->role === 'admin' ||
-            (auth()->user()->role === 'member' && $plan->user_id === auth()->id())
-        ) {
-            $plan->load('recipes');
-            return view('plans.show', compact('plan'));
+        if (auth()->user()->role === 'member') {
+            // miembros solo ven los suyos
+            abort_unless($plan->user_id === auth()->id(), 403);
         }
-        abort(403);
+        // admin puede ver cualquiera
+        $plan->load('recipes');
+        return view('plans.show', compact('plan'));
     }
 
-    // Generar PDF (ejemplo)
+    // 5. PDF de un plan
     public function pdf(Plan $plan)
     {
-        // Lógica similar: validaciones de rol, luego
-        $pdf = \PDF::loadView('plans.pdf', compact('plan'));
-        return $pdf->download("Plan-{$plan->id}.pdf");
+        if (auth()->user()->role === 'member') {
+            abort_unless($plan->user_id === auth()->id(), 403);
+        }
+        $plan->load('recipes');
+        $pdf = PDF::loadView('plans.pdf', compact('plan'));
+        return $pdf->download("plan-{$plan->id}.pdf");
     }
 
-    //  recordatorio por correo…
+
+    public function edit(Plan $plan)
+    {
+        abort_if(auth()->user()->role !== 'admin', 403);
+
+        $recipes = Recipe::all();
+        return view('plans.edit', compact('plan','recipes'));
+    }
+
+    /**
+     * Procesa la actualización (solo admin).
+     */
+    public function update(Request $request, Plan $plan)
+    {
+        abort_if(auth()->user()->role !== 'admin', 403);
+
+        $data = $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+            'recipes'    => 'array',
+            'recipes.*'  => 'array',
+            'recipes.*.*'=> 'integer|exists:recipes,id',
+        ]);
+
+        // Actualizar fechas y nombre
+        $plan->update([
+            'name'       => 'Plan '.$data['start_date'].' - '.$data['end_date'],
+            'start_date' => $data['start_date'],
+            'end_date'   => $data['end_date'],
+        ]);
+
+        // Resetear recetas asignadas
+        $plan->recipes()->detach();
+        foreach ($data['recipes'] as $day => $ids) {
+            foreach ($ids as $rid) {
+                $plan->recipes()->attach($rid, ['day_of_week' => $day]);
+            }
+        }
+
+        return redirect()
+            ->route('plans.index')
+            ->with('success','Plan actualizado correctamente');
+    }
+
+    /**
+     * Elimina un plan (solo admin).
+     */
+    public function destroy(Plan $plan)
+    {
+        abort_if(auth()->user()->role !== 'admin', 403);
+
+        $plan->delete();
+
+        return redirect()
+            ->route('plans.index')
+            ->with('success','Plan eliminado correctamente');
+    }
+
 }

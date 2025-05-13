@@ -5,33 +5,34 @@
   <title>Plan {{ $plan->id }} PDF</title>
   <style>
     body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
-    .heading { background: #f3f4f6; padding: 8px; font-weight: bold; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+    table { width:100%; border-collapse:collapse; margin-top:16px; }
+    th, td { border:1px solid #ddd; padding:6px; }
+    th { background:#f3f4f6; }
   </style>
 </head>
 <body>
   <h2>Plan Semanal: {{ $plan->name }}</h2>
   <p>Usuario: {{ $plan->user->name }} ({{ $plan->user->email }})</p>
-  <p>Desde {{ $plan->start_date }} hasta {{ $plan->end_date }}</p>
+  <p>Período: {{ $plan->start_date }} – {{ $plan->end_date }}</p>
 
   <table>
-    <tr class="heading">
+    <tr>
       <th>Día</th>
       <th>Recetas</th>
     </tr>
-    @foreach(['Mon'=>'Lunes','Tue'=>'Martes','Wed'=>'Miércoles','Thu'=>'Jueves','Fri'=>'Viernes','Sat'=>'Sábado','Sun'=>'Domingo'] as $code=>$day)
+    @foreach(['Mon'=>'Lunes','Tue'=>'Martes','Wed'=>'Miércoles',
+              'Thu'=>'Jueves','Fri'=>'Viernes','Sat'=>'Sábado','Sun'=>'Domingo'] as $code => $day)
       @php
-        $dayRecipes = $plan->recipes->filter(fn($r) => $r->pivot->day_of_week === $code);
+        $dr = $plan->recipes->filter(fn($r)=> $r->pivot->day_of_week === $code);
       @endphp
       <tr>
         <td>{{ $day }}</td>
         <td>
-          @if($dayRecipes->isEmpty())
+          @if($dr->isEmpty())
             —
           @else
-            <ul style="padding-left: 16px; margin:0;">
-              @foreach($dayRecipes as $r)
+            <ul>
+              @foreach($dr as $r)
                 <li>{{ $r->name }}</li>
               @endforeach
             </ul>
@@ -41,6 +42,6 @@
     @endforeach
   </table>
 
-  <p>Generado el {{ now()->format('d/m/Y H:i') }}</p>
+  <p style="margin-top:20px;">Generado: {{ now()->format('d/m/Y H:i') }}</p>
 </body>
 </html>
