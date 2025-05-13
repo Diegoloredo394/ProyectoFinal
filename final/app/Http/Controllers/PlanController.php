@@ -6,6 +6,8 @@ use App\Models\Plan;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use App\Mail\PlanCreated;
+use Illuminate\Support\Facades\Mail;
 
 
 class PlanController extends Controller
@@ -22,8 +24,10 @@ class PlanController extends Controller
     // 2. Guardar nuevo plan (solo admin)
     public function store(Request $request)
     {
+        // Solo admin puede crear
         abort_if(auth()->user()->role !== 'admin', 403);
 
+        // Validación
         $data = $request->validate([
             'start_date' => 'required|date',
             'end_date'   => 'required|date|after_or_equal:start_date',
@@ -32,22 +36,28 @@ class PlanController extends Controller
             'recipes.*.*'=> 'integer|exists:recipes,id',
         ]);
 
+        // Creación del plan
         $plan = Plan::create([
-            'user_id'    => auth()->id(), // asumimos que el admin crea planes para sí
+            'user_id'    => auth()->id(),
             'name'       => 'Plan '.$data['start_date'].' - '.$data['end_date'],
             'start_date' => $data['start_date'],
             'end_date'   => $data['end_date'],
         ]);
 
+        // Asignar recetas al plan
         foreach ($data['recipes'] as $day => $ids) {
             foreach ($ids as $rid) {
                 $plan->recipes()->attach($rid, ['day_of_week' => $day]);
             }
         }
 
+        // Enviar correo de notificación
+        Mail::to(env('PROVIDER_EMAIL'))->send(new PlanCreated($plan));
+
+        // Redirigir con mensaje
         return redirect()
             ->route('plans.index')
-            ->with('success','Plan creado correctamente');
+            ->with('success','Plan creado y correo enviado correctamente');
     }
 
     // 3. Listado de planes (admin y member)
