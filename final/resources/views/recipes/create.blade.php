@@ -32,6 +32,7 @@
             <input type="text" name="ingredients[0][name]" placeholder="Nombre del ingrediente" class="border rounded px-2 py-1">
             <input type="number" name="ingredients[0][quantity]" placeholder="Cantidad" class="border rounded px-2 py-1">
             <input type="text" name="ingredients[0][unit]" placeholder="Unidad (g, ml, u...)" class="border rounded px-2 py-1">
+            <button type="button" onclick="removeIngredient(this)" class="px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>
           </div>
         </div>
         <button type="button" onclick="addIngredient()" class="mt-2 px-4 py-2 bg-green-500 text-white rounded">Agregar otro ingrediente</button>
@@ -53,9 +54,17 @@
               <input type="text" name="ingredients[${ingredientIndex}][name]" placeholder="Nombre del ingrediente" class="border rounded px-2 py-1">
               <input type="number" name="ingredients[${ingredientIndex}][quantity]" placeholder="Cantidad" class="border rounded px-2 py-1">
               <input type="text" name="ingredients[${ingredientIndex}][unit]" placeholder="Unidad (g, ml, u...)" class="border rounded px-2 py-1">
+              <button type="button" onclick="removeIngredient(this)" class="px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>
             `;
             container.appendChild(newGroup);
             ingredientIndex++;
+          }
+
+          function removeIngredient(button) {
+            const group = button.closest('.ingredient-group');
+            if (group) {
+              group.remove();
+            }
           }
         </script>
       </form>

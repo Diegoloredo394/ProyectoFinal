@@ -103,30 +103,27 @@ class RecipeController extends Controller
             'description' => 'nullable|string',
             'steps'       => 'nullable|string',
             'ingredients' => 'nullable|array',
-            'ingredients.*.name'     => 'required|string|max:255',
+            'ingredients.*.name' => 'required|string|max:255',
             'ingredients.*.quantity' => 'required|numeric|min:0',
-            'ingredients.*.unit'     => 'required|string|max:10',
+            'ingredients.*.unit' => 'required|string|max:10',
         ]);
 
-        $recipe->update([
-            'name'        => $data['name'],
-            'description' => $data['description'] ?? '',
-            'steps'       => $data['steps'] ?? '',
-        ]);
+        $recipe->update($data);
 
-        // Sincronizar ingredientes
-        $syncData = [];
-        foreach ($data['ingredients'] ?? [] as $ing) {
+        // Limpia todos los ingredientes actuales
+        $recipe->ingredients()->detach();
+
+        // Y vuelve a adjuntar los que se envían
+        foreach ($request->input('ingredients', []) as $ing) {
             $ingredient = Ingredient::firstOrCreate(['name' => $ing['name']]);
-            $syncData[$ingredient->id] = [
+            $recipe->ingredients()->attach($ingredient->id, [
                 'quantity' => $ing['quantity'],
                 'unit'     => $ing['unit'],
-            ];
+            ]);
         }
-        $recipe->ingredients()->sync($syncData);
 
         return redirect()
-            ->route('recipes.show', $recipe)
+            ->route('recipes.index')
             ->with('success', 'Receta actualizada correctamente.');
     }
 

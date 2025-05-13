@@ -36,6 +36,7 @@
                      placeholder="Cantidad" class="border rounded px-2 py-1">
               <input type="text" name="ingredients[{{ $index }}][unit]" value="{{ old("ingredients.$index.unit", $ing->pivot->unit) }}"
                      placeholder="Unidad (g, ml, u...)" class="border rounded px-2 py-1">
+              <button type="button" onclick="removeIngredient(this)" class="px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>
             </div>
           @endforeach
         </div>
@@ -67,9 +68,16 @@
           <input type="text" name="ingredients[${ingredientIndex}][name]" placeholder="Nombre del ingrediente" class="border rounded px-2 py-1">
           <input type="number" name="ingredients[${ingredientIndex}][quantity]" placeholder="Cantidad" class="border rounded px-2 py-1">
           <input type="text" name="ingredients[${ingredientIndex}][unit]" placeholder="Unidad (g, ml, u...)" class="border rounded px-2 py-1">
+          <button type="button" onclick="removeIngredient(this)" class="px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>
         `;
         container.appendChild(newGroup);
         ingredientIndex++;
+      }
+      function removeIngredient(button) {
+          const group = button.closest('.ingredient-group');
+          if (group) {
+              group.remove();
+          }
       }
     </script>
   </x-app-layout>
