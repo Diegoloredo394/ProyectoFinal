@@ -14,12 +14,15 @@
 
         <!-- Recetas / Planes -->
         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-          <x-nav-link
-            :href="route('recipes.index')"
-            :active="request()->routeIs('recipes.*')"
-          >
-            Recetas
-          </x-nav-link>
+            @if (Auth::user()->role === 'admin')
+            
+              <x-nav-link
+                :href="route('recipes.index')"
+                :active="request()->routeIs('recipes.*')"
+              >
+                Recetas
+              </x-nav-link>
+            @endif
 
           <x-nav-link
             :href="route('plans.index')"
@@ -119,12 +122,15 @@
   <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
     <!-- Tabs -->
     <div class="pt-2 pb-3 space-y-1">
-      <x-responsive-nav-link
-        :href="route('recipes.index')"
-        :active="request()->routeIs('recipes.*')"
-      >
-        Recetas
-      </x-responsive-nav-link>
+      @if (Auth::user()->role === 'admin')
+            
+        <x-responsive-nav-link
+          :href="route('recipes.index')"
+          :active="request()->routeIs('recipes.*')"
+        >
+          Recetas
+        </x-responsive-nav-link>
+      @endif
       <x-responsive-nav-link
         :href="route('plans.index')"
         :active="request()->routeIs('plans.*')"

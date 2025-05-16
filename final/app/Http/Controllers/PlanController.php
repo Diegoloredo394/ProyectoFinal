@@ -21,14 +21,13 @@ class PlanController extends Controller
         return view('plans.create', compact('recipes'));
     }
 
-    // 2. Guardar nuevo plan (solo admin)
+        // 2. Guardar nuevo plan (solo admin)
     public function store(Request $request)
     {
-        // Solo admin puede crear
         abort_if(auth()->user()->role !== 'admin', 403);
 
-        // Validación
         $data = $request->validate([
+            'user_id'    => 'required|exists:users,id',
             'start_date' => 'required|date',
             'end_date'   => 'required|date|after_or_equal:start_date',
             'recipes'    => 'array',
@@ -36,29 +35,28 @@ class PlanController extends Controller
             'recipes.*.*'=> 'integer|exists:recipes,id',
         ]);
 
-        // Creación del plan
         $plan = Plan::create([
-            'user_id'    => auth()->id(),
+            'user_id'    => $data['user_id'],             // ← asignación real
             'name'       => 'Plan '.$data['start_date'].' - '.$data['end_date'],
             'start_date' => $data['start_date'],
             'end_date'   => $data['end_date'],
         ]);
 
-        // Asignar recetas al plan
+        // adjuntar recetas…
         foreach ($data['recipes'] as $day => $ids) {
             foreach ($ids as $rid) {
                 $plan->recipes()->attach($rid, ['day_of_week' => $day]);
             }
         }
 
-        // Enviar correo de notificación
+        // enviar correo…
         Mail::to(env('PROVIDER_EMAIL'))->send(new PlanCreated($plan));
 
-        // Redirigir con mensaje
         return redirect()
             ->route('plans.index')
             ->with('success','Plan creado y correo enviado correctamente');
     }
+
 
     // 3. Listado de planes (admin y member)
     public function index()
@@ -114,6 +112,7 @@ class PlanController extends Controller
         abort_if(auth()->user()->role !== 'admin', 403);
 
         $data = $request->validate([
+            'user_id'    => 'required|exists:users,id',
             'start_date' => 'required|date',
             'end_date'   => 'required|date|after_or_equal:start_date',
             'recipes'    => 'array',
@@ -121,14 +120,14 @@ class PlanController extends Controller
             'recipes.*.*'=> 'integer|exists:recipes,id',
         ]);
 
-        // Actualizar fechas y nombre
         $plan->update([
+            'user_id'    => $data['user_id'],             // ← posible reasignación
             'name'       => 'Plan '.$data['start_date'].' - '.$data['end_date'],
             'start_date' => $data['start_date'],
             'end_date'   => $data['end_date'],
         ]);
 
-        // Resetear recetas asignadas
+        // resetear y volver a adjuntar recetas…
         $plan->recipes()->detach();
         foreach ($data['recipes'] as $day => $ids) {
             foreach ($ids as $rid) {

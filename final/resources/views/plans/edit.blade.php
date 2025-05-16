@@ -7,6 +7,22 @@
     <form action="{{ route('plans.update', $plan) }}" method="POST" class="space-y-4">
       @csrf @method('PUT')
 
+        <!-- Selector de usuario -->
+  <div>
+    <label class="block text-gray-700">Asignar a:</label>
+    <select name="user_id" class="mt-1 block w-full border-gray-300 rounded">
+      @foreach(\App\Models\User::where('role','member')->get() as $user)
+        <option value="{{ $user->id }}"
+          {{ old('user_id', $plan->user_id) == $user->id ? 'selected' : '' }}>
+          {{ $user->name }} ({{ $user->email }})
+        </option>
+      @endforeach
+    </select>
+    @error('user_id')
+      <span class="text-red-600 text-sm">{{ $message }}</span>
+    @enderror
+  </div>
+
       <!-- Fechas -->
       <div class="grid grid-cols-2 gap-4">
         <div>

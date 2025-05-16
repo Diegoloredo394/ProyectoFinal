@@ -71,7 +71,28 @@
 
   <script>
     let ingredientIndex = {{ $recipe->ingredients->count() }};
-    function addIngredient() { /* igual al create */ }
-    function removeIngredient(btn) { /* igual al create */ }
+    function addIngredient() {
+      
+      const container = document.getElementById('ingredients');
+      const div = document.createElement('div');
+      div.className = 'ingredient-group flex items-center space-x-2 mt-2';
+      div.innerHTML = `
+        <input type="text" name="ingredients[${ingredientIndex}][name]" placeholder="Ingrediente"
+               class="border-gray-300 rounded px-2 py-1" required>
+        <input type="number" name="ingredients[${ingredientIndex}][quantity]" placeholder="Cant."
+               class="border-gray-300 rounded px-2 py-1" required>
+        <input type="text" name="ingredients[${ingredientIndex}][unit]" placeholder="Unidad"
+               class="border-gray-300 rounded px-2 py-1" required>
+        <button type="button" onclick="removeIngredient(this)"
+                class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-500">
+          Eliminar
+        </button>
+      `;
+      container.appendChild(div);
+      ingredientIndex++;
+     }
+    function removeIngredient(btn) { 
+      btn.closest('.ingredient-group')?.remove();
+     }
   </script>
 </x-app-layout>
