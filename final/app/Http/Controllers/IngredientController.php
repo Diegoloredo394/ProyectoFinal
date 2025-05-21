@@ -2,73 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ingredient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class IngredientController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * AJAX: devuelve sugerencias de Spoonacular.
      */
-    public function index()
-    {
-        // Solo admin
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
-    
-        $ingredient = Recipe::all();
-        return view('ingredient.index', compact('ingredient'));
+public function search(Request $request)
+{
+    $q = $request->get('q', '');
+    if (strlen($q) < 2) {
+        return response()->json([]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    $apiKey = config('services.spoonacular.key');
+    $url    = config('services.spoonacular.autocomplete_url');
+
+    $resp = Http::withOptions([
+        'verify'  => false,   // DESACTIVA la verificación SSL
+        'timeout' => 5,       // opcional, corta la petición si tarda >5s
+    ])->get($url, [
+        'apiKey' => $apiKey,
+        'query'  => $q,
+        'number' => 10,
+    ]);
+
+    if (! $resp->ok()) {
+        return response()->json([], $resp->status());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Recipe $ingredient)
-    {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
-        return view('ingredient.show', compact('ingredient'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Ingredient $ingredient)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Ingredient $ingredient)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Ingredient $ingredient)
-    {
-        //
-    }
+    $names = collect($resp->json())->pluck('name')->all();
+    return response()->json($names);
+}
 }

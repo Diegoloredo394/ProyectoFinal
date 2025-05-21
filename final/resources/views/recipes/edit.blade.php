@@ -9,21 +9,25 @@
 
       <div>
         <label class="block font-medium text-gray-700">Nombre</label>
-        <input type="text" name="name"
+        <input type="text"
+               name="name"
                value="{{ old('name', $recipe->name) }}"
-               class="mt-1 block w-full border-gray-300 rounded" required>
+               class="mt-1 block w-full border-gray-300 rounded"
+               required>
         @error('name')<span class="text-red-600">{{ $message }}</span>@enderror
       </div>
 
       <div>
         <label class="block font-medium text-gray-700">Descripción</label>
-        <textarea name="description" rows="3"
+        <textarea name="description"
+                  rows="3"
                   class="mt-1 block w-full border-gray-300 rounded">{{ old('description', $recipe->description) }}</textarea>
       </div>
 
       <div>
         <label class="block font-medium text-gray-700">Pasos</label>
-        <textarea name="steps" rows="5"
+        <textarea name="steps"
+                  rows="5"
                   class="mt-1 block w-full border-gray-300 rounded">{{ old('steps', $recipe->steps) }}</textarea>
       </div>
 
@@ -31,15 +35,26 @@
       <div id="ingredients">
         @foreach($recipe->ingredients as $i => $ing)
           <div class="ingredient-group flex items-center space-x-2 mt-2">
-            <input type="text" name="ingredients[{{ $i }}][name]" 
+            <input type="text"
+                   name="ingredients[{{ $i }}][name]"
                    value="{{ old("ingredients.$i.name", $ing->name) }}"
-                   class="border-gray-300 rounded px-2 py-1" required>
-            <input type="number" name="ingredients[{{ $i }}][quantity]" 
+                   placeholder="Ingrediente"
+                   list="ingredients-list"
+                   oninput="fetchSuggestions(this.value)"
+                   class="border-gray-300 rounded px-2 py-1"
+                   required>
+            <input type="number"
+                   name="ingredients[{{ $i }}][quantity]"
                    value="{{ old("ingredients.$i.quantity", $ing->pivot->quantity) }}"
-                   class="border-gray-300 rounded px-2 py-1" required>
-            <input type="text" name="ingredients[{{ $i }}][unit]" 
+                   placeholder="Cant."
+                   class="border-gray-300 rounded px-2 py-1"
+                   required>
+            <input type="text"
+                   name="ingredients[{{ $i }}][unit]"
                    value="{{ old("ingredients.$i.unit", $ing->pivot->unit) }}"
-                   class="border-gray-300 rounded px-2 py-1" required>
+                   placeholder="Unidad"
+                   class="border-gray-300 rounded px-2 py-1"
+                   required>
             <button type="button" onclick="removeIngredient(this)"
                     class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-500">
               Eliminar
@@ -69,20 +84,56 @@
     </a>
   </div>
 
+  {{-- Datalist global para sugerencias --}}
+  <datalist id="ingredients-list"></datalist>
+
   <script>
+    // Comenzamos con el número de ingredientes actuales
     let ingredientIndex = {{ $recipe->ingredients->count() }};
+
+    // Autocompleta usando Spoonacular
+  async function fetchSuggestions(q) {
+    const list = document.getElementById('ingredients-list');
+    // limpia anteriores
+    list.innerHTML = '';
+    if (!q) return;
+    try {
+      const res = await axios.get('{{ url('ingredients/search') }}', {
+        params: { q }
+      });
+      res.data.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        list.appendChild(opt);
+      });
+    } catch (e) {
+      console.error('Error al llamar a ingredients.search', e);
+    }
+  }
+
+    // Añade un nuevo grupo de inputs
     function addIngredient() {
-      
       const container = document.getElementById('ingredients');
       const div = document.createElement('div');
       div.className = 'ingredient-group flex items-center space-x-2 mt-2';
       div.innerHTML = `
-        <input type="text" name="ingredients[${ingredientIndex}][name]" placeholder="Ingrediente"
-               class="border-gray-300 rounded px-2 py-1" required>
-        <input type="number" name="ingredients[${ingredientIndex}][quantity]" placeholder="Cant."
-               class="border-gray-300 rounded px-2 py-1" required>
-        <input type="text" name="ingredients[${ingredientIndex}][unit]" placeholder="Unidad"
-               class="border-gray-300 rounded px-2 py-1" required>
+        <input type="text"
+               name="ingredients[${ingredientIndex}][name]"
+               placeholder="Ingrediente"
+               list="ingredients-list"
+               oninput="fetchSuggestions(this.value)"
+               class="border-gray-300 rounded px-2 py-1"
+               required>
+        <input type="number"
+               name="ingredients[${ingredientIndex}][quantity]"
+               placeholder="Cant."
+               class="border-gray-300 rounded px-2 py-1"
+               required>
+        <input type="text"
+               name="ingredients[${ingredientIndex}][unit]"
+               placeholder="Unidad"
+               class="border-gray-300 rounded px-2 py-1"
+               required>
         <button type="button" onclick="removeIngredient(this)"
                 class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-500">
           Eliminar
@@ -90,9 +141,11 @@
       `;
       container.appendChild(div);
       ingredientIndex++;
-     }
-    function removeIngredient(btn) { 
+    }
+
+    // Elimina un grupo de inputs
+    function removeIngredient(btn) {
       btn.closest('.ingredient-group')?.remove();
-     }
+    }
   </script>
 </x-app-layout>

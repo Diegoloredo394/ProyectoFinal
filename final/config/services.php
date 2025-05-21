@@ -34,5 +34,13 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    
+  'spoonacular' => [
+    'key'               => env('SPOONACULAR_KEY'),
+    'autocomplete_url'  => env(
+      'SPOONACULAR_AUTOCOMPLETE_URL',
+      'https://api.spoonacular.com/food/ingredients/autocomplete'
+    ),
+  ],
 
 ];
