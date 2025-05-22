@@ -3,45 +3,45 @@
     <h2 class="text-xl font-semibold text-gray-900">Editar Receta</h2>
   </x-slot>
 
-  <div class="p-4 bg-white rounded shadow">
+  <div class="m-6 p-6 bg-white rounded-xl shadow-md space-y-6">
     <form action="{{ route('recipes.update', $recipe) }}" method="POST" class="space-y-4">
       @csrf @method('PUT')
 
       <div>
-        <label class="block font-medium text-gray-700">Nombre</label>
+        <label class="block text-sm font-medium text-gray-800 mb-1">🍽️ Nombre</label>
         <input type="text"
                name="name"
                value="{{ old('name', $recipe->name) }}"
-               class="mt-1 block w-full border-gray-300 rounded"
+               class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                required>
-        @error('name')<span class="text-red-600">{{ $message }}</span>@enderror
+        @error('name')<span class="text-sm text-red-600">{{ $message }}</span>@enderror
       </div>
 
       <div>
-        <label class="block font-medium text-gray-700">Descripción</label>
+        <label class="block text-sm font-medium text-gray-800 mb-1">📝 Descripción</label>
         <textarea name="description"
                   rows="3"
-                  class="mt-1 block w-full border-gray-300 rounded">{{ old('description', $recipe->description) }}</textarea>
+                  class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">{{ old('description', $recipe->description) }}</textarea>
       </div>
 
       <div>
-        <label class="block font-medium text-gray-700">Pasos</label>
+        <label class="block text-sm font-medium text-gray-800 mb-1">👨‍🍳 Pasos</label>
         <textarea name="steps"
                   rows="5"
-                  class="mt-1 block w-full border-gray-300 rounded">{{ old('steps', $recipe->steps) }}</textarea>
+                  class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">{{ old('steps', $recipe->steps) }}</textarea>
       </div>
 
-      <h4 class="font-semibold text-gray-800">Ingredientes</h4>
-      <div id="ingredients">
+      <h4 class="text-md font-semibold text-gray-800 mb-2">🥄 Ingredientes</h4>
+      <div id="ingredients" class="space-y-3">
         @foreach($recipe->ingredients as $i => $ing)
-          <div class="ingredient-group flex items-center space-x-2 mt-2">
+          <div class="ingredient-group flex flex-wrap items-center gap-2">
             <input type="text"
                    name="ingredients[{{ $i }}][name]"
                    value="{{ old("ingredients.$i.name", $ing->name) }}"
                    placeholder="Ingrediente"
                    list="ingredients-list"
                    oninput="fetchSuggestions(this.value)"
-                   class="border-gray-300 rounded px-2 py-1"
+                   class="flex-1 min-w-[150px] border border-gray-300 rounded-lg px-3 py-1.5"
                    required>
             <input type="number"
                    name="ingredients[{{ $i }}][quantity]"
@@ -63,14 +63,17 @@
         @endforeach
       </div>
 
-      <button type="button" onclick="addIngredient()"
-              class="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
-        Agregar ingrediente
-      </button>
+      <button
+                type="button"
+                onclick="addIngredient()"
+                class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 text-sm"
+            >
+                ➕ Agregar ingrediente
+            </button>
 
       <div class="text-right">
         <button type="submit"
-                class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                class="inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition">
           Actualizar Receta
         </button>
       </div>

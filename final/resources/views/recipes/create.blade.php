@@ -3,102 +3,115 @@
     <h2 class="text-xl font-semibold text-gray-900">Crear Receta</h2>
   </x-slot>
 
-  <div class="p-4 bg-white rounded shadow">
-    <form action="{{ route('recipes.store') }}" method="POST" class="space-y-4">
-      @csrf
+  <div class="m-6 p-6 bg-white rounded-xl shadow-md space-y-6">
+    <form action="{{ route('recipes.store') }}" method="POST" class="space-y-5">
+        @csrf
 
-      {{-- Nombre --}}
-      <div>
-        <label class="block font-medium text-gray-700">Nombre</label>
-        <input
-          type="text"
-          name="name"
-          value="{{ old('name') }}"
-          class="mt-1 block w-full border-gray-300 rounded"
-          required
-        >
-        @error('name')<span class="text-red-600">{{ $message }}</span>@enderror
-      </div>
-
-      {{-- Descripción --}}
-      <div>
-        <label class="block font-medium text-gray-700">Descripción</label>
-        <textarea
-          name="description"
-          rows="3"
-          class="mt-1 block w-full border-gray-300 rounded"
-        >{{ old('description') }}</textarea>
-      </div>
-
-      {{-- Pasos --}}
-      <div>
-        <label class="block font-medium text-gray-700">Pasos</label>
-        <textarea
-          name="steps"
-          rows="5"
-          class="mt-1 block w-full border-gray-300 rounded"
-        >{{ old('steps') }}</textarea>
-      </div>
-
-      {{-- Ingredientes --}}
-      <h4 class="font-semibold text-gray-800">Ingredientes</h4>
-      <div id="ingredients">
-        <div class="ingredient-group flex items-center space-x-2">
-          <input
-            type="text"
-            name="ingredients[0][name]"
-            list="ingredients-list"
-            oninput="fetchSuggestions(this.value)"
-            placeholder="Ingrediente"
-            class="border-gray-300 rounded px-2 py-1"
-            required
-          >
-          <input
-            type="number"
-            name="ingredients[0][quantity]"
-            placeholder="Cant."
-            class="border-gray-300 rounded px-2 py-1"
-            required
-          >
-          <input
-            type="text"
-            name="ingredients[0][unit]"
-            placeholder="Unidad"
-            class="border-gray-300 rounded px-2 py-1"
-            required
-          >
-          <button
-            type="button"
-            onclick="removeIngredient(this)"
-            class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-500"
-          >Eliminar</button>
+        <!-- Nombre -->
+        <div>
+            <label class="block text-sm font-medium text-gray-800 mb-1">🍽️ Nombre</label>
+            <input
+                type="text"
+                name="name"
+                value="{{ old('name') }}"
+                class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+            >
+            @error('name')
+                <span class="text-sm text-red-600">{{ $message }}</span>
+            @enderror
         </div>
-      </div>
 
-      {{-- Datalist para sugerencias --}}
-      <datalist id="ingredients-list"></datalist>
+        <!-- Descripción -->
+        <div>
+            <label class="block text-sm font-medium text-gray-800 mb-1">📝 Descripción</label>
+            <textarea
+                name="description"
+                rows="3"
+                class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >{{ old('description') }}</textarea>
+        </div>
 
-      {{-- Botones --}}
-      <button
-        type="button"
-        onclick="addIngredient()"
-        class="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500"
-      >Agregar ingrediente</button>
+        <!-- Pasos -->
+        <div>
+            <label class="block text-sm font-medium text-gray-800 mb-1">👨‍🍳 Pasos</label>
+            <textarea
+                name="steps"
+                rows="5"
+                class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >{{ old('steps') }}</textarea>
+        </div>
 
-      <div class="text-right">
-        <button
-          type="submit"
-          class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-        >Guardar Receta</button>
-      </div>
+        <!-- Ingredientes -->
+        <div>
+            <h4 class="text-md font-semibold text-gray-800 mb-2">🥄 Ingredientes</h4>
+            <div id="ingredients" class="space-y-3">
+                <div class="ingredient-group flex flex-wrap items-center gap-2">
+                    <input
+                        type="text"
+                        name="ingredients[0][name]"
+                        list="ingredients-list"
+                        oninput="fetchSuggestions(this.value)"
+                        placeholder="Ingrediente"
+                        class="flex-1 min-w-[150px] border border-gray-300 rounded-lg px-3 py-1.5"
+                        required
+                    >
+                    <input
+                        type="number"
+                        name="ingredients[0][quantity]"
+                        placeholder="Cant."
+                        class="w-24 border border-gray-300 rounded-lg px-3 py-1.5"
+                        required
+                    >
+                    <input
+                        type="text"
+                        name="ingredients[0][unit]"
+                        placeholder="Unidad"
+                        class="w-28 border border-gray-300 rounded-lg px-3 py-1.5"
+                        required
+                    >
+                    <button
+                        type="button"
+                        onclick="removeIngredient(this)"
+                        class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-500 text-sm"
+                    >
+                        🗑️ Eliminar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botón para agregar ingrediente -->
+            <button
+                type="button"
+                onclick="addIngredient()"
+                class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 text-sm"
+            >
+                ➕ Agregar ingrediente
+            </button>
+
+            <datalist id="ingredients-list"></datalist>
+        </div>
+
+        <!-- Botón de guardar -->
+        <div class="text-right">
+            <button
+                type="submit"
+                class="inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition"
+            >
+                💾 Guardar Receta
+            </button>
+        </div>
     </form>
-  </div>
+</div>
 
-  <div class="p-4">
-    <a href="{{ route('recipes.index') }}" class="text-gray-700 hover:underline">
-      ← Volver al listado
+<!-- Volver al listado -->
+<div class="p-4">
+    <a href="{{ route('recipes.index') }}"
+       class="inline-flex items-center text-sm text-gray-700 hover:text-blue-600 hover:underline transition">
+        ← Volver al listado
     </a>
-  </div>
+</div>
+
 
   {{-- JavaScript de autocompletado dinámico --}}
   <script>
