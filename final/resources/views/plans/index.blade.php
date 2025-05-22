@@ -1,6 +1,6 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="text-xl font-semibold text-gray-900">
+    <h2 class="text-xl font-semibold text-white">
       @if(auth()->user()->role === 'admin')
         Todos los Planes Semanales
       @else
@@ -16,9 +16,9 @@
       </div>
     @endif
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @foreach($plans as $plan)
-        <div class="bg-white p-4 rounded shadow hover:shadow-lg transition">
+        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-200 p-5 transform transition duration-300 hover:scale-105 hover:shadow-lg">
           <h3 class="font-bold text-gray-800">{{ $plan->name }}</h3>
           <p class="text-sm text-gray-600">
             {{ $plan->start_date }} – {{ $plan->end_date }}
@@ -59,7 +59,7 @@
     @if(auth()->user()->role==='admin')
       <div class="mt-6 text-right">
         <a href="{{ route('plans.create') }}"
-           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+           class="inline-flex items-center px-5 py-2.5 bg-[#60492C] text-white text-sm font-semibold rounded-lg shadow hover:bg-[#463F1A] transition duration-200">
           Nuevo Plan
         </a>
       </div>

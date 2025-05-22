@@ -1,81 +1,83 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="text-xl font-semibold text-gray-900">Nuevo Plan Semanal</h2>
+    <h2 class="text-xl font-semibold text-white">Nuevo Plan Semanal</h2>
   </x-slot>
 
-  <div class="p-4 bg-white rounded shadow">
-    <form action="{{ route('plans.store') }}" method="POST" class="space-y-4">
-      @csrf
+  <div class="m-6 max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-md">
+  <h2 class="text-xl font-semibold text-gray-800 mb-4">Crear Nuevo Plan</h2>
 
-            <!-- 1. Selector de usuario -->
+  <form action="{{ route('plans.store') }}" method="POST" class="space-y-6">
+    @csrf
+
+    <!-- Selector de usuario -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Asignar a</label>
+      <select name="user_id" class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @foreach(\App\Models\User::where('role','member')->get() as $user)
+          <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+            {{ $user->name }} ({{ $user->email }})
+          </option>
+        @endforeach
+      </select>
+      @error('user_id')
+        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <!-- Fechas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-gray-700">Asignar a:</label>
-        <select name="user_id" class="mt-1 block w-full border-gray-300 rounded">
-          @foreach(\App\Models\User::where('role','member')->get() as $user)
-            <option value="{{ $user->id }}"
-              {{ old('user_id') == $user->id ? 'selected' : '' }}>
-              {{ $user->name }} ({{ $user->email }})
-            </option>
+        <label class="block text-sm font-medium text-gray-700">Fecha de inicio</label>
+        <input type="date" name="start_date" value="{{ old('start_date', now()->toDateString()) }}"
+               class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('start_date')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Fecha de fin</label>
+        <input type="date" name="end_date" value="{{ old('end_date', now()->addDays(6)->toDateString()) }}"
+               class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('end_date')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+      </div>
+    </div>
+
+    <!-- Recetas por día -->
+    @php
+      $days = ['Mon'=>'Lunes','Tue'=>'Martes','Wed'=>'Miércoles','Thu'=>'Jueves','Fri'=>'Viernes','Sat'=>'Sábado','Sun'=>'Domingo'];
+    @endphp
+
+    @foreach($days as $code => $day)
+      <div>
+        <h3 class="font-semibold text-gray-800 mb-2">{{ $day }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          @foreach($recipes as $recipe)
+            <label class="flex items-center space-x-2">
+              <input type="checkbox"
+                     name="recipes[{{ $code }}][]"
+                     value="{{ $recipe->id }}"
+                     class="form-checkbox h-4 w-4 text-blue-600">
+              <span class="text-gray-700">{{ $recipe->name }}</span>
+            </label>
           @endforeach
-        </select>
-        @error('user_id')
-          <span class="text-red-600 text-sm">{{ $message }}</span>
-        @enderror
-      </div>
-
-      <!-- Fechas -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-gray-700">Fecha inicio</label>
-          <input type="date" name="start_date"
-                 value="{{ old('start_date', now()->toDateString()) }}"
-                 class="mt-1 block w-full border-gray-300 rounded">
-          @error('start_date')<span class="text-red-600">{{ $message }}</span>@enderror
-        </div>
-        <div>
-          <label class="block text-gray-700">Fecha fin</label>
-          <input type="date" name="end_date"
-                 value="{{ old('end_date', now()->addDays(6)->toDateString()) }}"
-                 class="mt-1 block w-full border-gray-300 rounded">
-          @error('end_date')<span class="text-red-600">{{ $message }}</span>@enderror
         </div>
       </div>
+    @endforeach
 
-      <!-- Selección de recetas por día -->
-      @php
-        $days = ['Mon'=>'Lunes','Tue'=>'Martes','Wed'=>'Miércoles',
-                 'Thu'=>'Jueves','Fri'=>'Viernes','Sat'=>'Sábado','Sun'=>'Domingo'];
-      @endphp
-      @foreach($days as $code => $day)
-        <div class="space-y-1">
-          <h3 class="font-semibold text-gray-800">{{ $day }}</h3>
-          <div class="grid grid-cols-2 gap-2">
-            @foreach($recipes as $recipe)
-              <label class="inline-flex items-center space-x-2">
-                <input type="checkbox"
-                       name="recipes[{{ $code }}][]"
-                       value="{{ $recipe->id }}"
-                       class="form-checkbox h-4 w-4 text-blue-600">
-                <span class="text-gray-700">{{ $recipe->name }}</span>
-              </label>
-            @endforeach
-          </div>
-        </div>
-      @endforeach
+    <!-- Botón de envío -->
+    <div class="flex justify-end">
+      <button type="submit"
+              class="bg-[#463f1a] hover:bg-[#60492C] text-white font-semibold px-6 py-2 rounded-lg transition duration-200">
+        Guardar Plan
+      </button>
+    </div>
+  </form>
+</div>
 
-      <div class="text-right">
-        <button type="submit"
-                class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
-          Guardar Plan
-        </button>
-      </div>
-    </form>
-  </div>
+<!-- Enlace de regreso -->
+<div class="mt-6 text-center">
+  <a href="{{ route('plans.index') }}" class="text-white-600 hover:underline">
+    ← Volver al listado de planes
+  </a>
+</div>
 
-  <div class="mt-4 p-4">
-    <a href="{{ route('plans.index') }}"
-       class="text-gray-700 hover:underline">
-      Volver al listado de planes
-    </a>
-  </div>
 </x-app-layout>
