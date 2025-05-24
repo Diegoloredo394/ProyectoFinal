@@ -3,7 +3,7 @@
       <h2 class="text-xl font-semibold text-temu-dark">{{ $recipe->name }}</h2>
     </x-slot>
   
-    <div class="m-6 p-6 bg-white rounded-xl shadow-md space-y-6">
+    <div class="m-6 p-6 bg-[#e7dbcb] rounded-xl shadow-md space-y-6">
         <!-- Descripción -->
         <div>
             <h3 class="text-lg font-semibold text-gray-800 mb-1">📝 Descripción</h3>

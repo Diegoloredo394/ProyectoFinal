@@ -3,7 +3,7 @@
     <h2 class="text-xl font-semibold text-white">Nuevo Plan Semanal</h2>
   </x-slot>
 
-  <div class="m-6 max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-md">
+  <div class="m-6 max-w-4xl mx-auto bg-[#e7dbcb] p-6 rounded-2xl shadow-md">
   <h2 class="text-xl font-semibold text-gray-800 mb-4">Crear Nuevo Plan</h2>
 
   <form action="{{ route('plans.store') }}" method="POST" class="space-y-6">

@@ -1,9 +1,9 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="text-xl font-semibold text-gray-900">Crear Receta</h2>
+    <h2 class="text-xl font-semibold text-white">Crear Receta</h2>
   </x-slot>
 
-  <div class="m-6 p-6 bg-white rounded-xl shadow-md space-y-6">
+  <div class="m-6 p-6 bg-[#e7dbcb] rounded-xl shadow-md space-y-6">
     <form action="{{ route('recipes.store') }}" method="POST" class="space-y-5">
         @csrf
 
@@ -70,13 +70,6 @@
                         class="w-28 border border-gray-300 rounded-lg px-3 py-1.5"
                         required
                     >
-                    <button
-                        type="button"
-                        onclick="removeIngredient(this)"
-                        class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-500 text-sm"
-                    >
-                        🗑️ Eliminar
-                    </button>
                 </div>
             </div>
 
@@ -136,7 +129,7 @@
     function addIngredient() {
       const container = document.getElementById('ingredients');
       const div = document.createElement('div');
-      div.className = 'ingredient-group flex items-center space-x-2 mt-2';
+      div.className = 'ingredient-group flex flex-wrap items-center gap-2';
       div.innerHTML = `
         <input
           type="text"
@@ -144,28 +137,30 @@
           list="ingredients-list"
           oninput="fetchSuggestions(this.value)"
           placeholder="Ingrediente"
-          class="border-gray-300 rounded px-2 py-1"
+          class="flex-1 min-w-[150px] border border-gray-300 rounded-lg px-3 py-1.5"
           required
         >
         <input
           type="number"
           name="ingredients[${ingredientIndex}][quantity]"
           placeholder="Cant."
-          class="border-gray-300 rounded px-2 py-1"
+          class="w-24 border border-gray-300 rounded-lg px-3 py-1.5"
           required
         >
         <input
           type="text"
           name="ingredients[${ingredientIndex}][unit]"
           placeholder="Unidad"
-          class="border-gray-300 rounded px-2 py-1"
+          class="w-24 border border-gray-300 rounded-lg px-3 py-1.5"
           required
         >
         <button
           type="button"
           onclick="removeIngredient(this)"
-          class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-500"
-        >Eliminar</button>
+          class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-500 text-sm"
+        >
+          🗑️ Eliminar
+        </button>
       `;
       container.appendChild(div);
       ingredientIndex++;

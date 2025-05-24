@@ -5,7 +5,7 @@
     </h2>
   </x-slot>
 
-  <div class="m-6 p-6 bg-white rounded-xl shadow-md space-y-6">
+  <div class="m-6 p-6 bg-[#e7dbcb] rounded-xl shadow-md space-y-6">
     <h2 class="text-2xl font-bold text-gray-900 border-b pb-2">Plan Semanal</h2>
 
     @php

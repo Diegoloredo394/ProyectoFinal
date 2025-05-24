@@ -18,7 +18,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @foreach($plans as $plan)
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-200 p-5 transform transition duration-300 hover:scale-105 hover:shadow-lg">
+        <div class="bg-[#e7dbcb] rounded-xl shadow-md hover:shadow-lg transition duration-200 p-5 transform transition duration-300 hover:scale-105 hover:shadow-lg">
           <h3 class="font-bold text-gray-800">{{ $plan->name }}</h3>
           <p class="text-sm text-gray-600">
             {{ $plan->start_date }} – {{ $plan->end_date }}
