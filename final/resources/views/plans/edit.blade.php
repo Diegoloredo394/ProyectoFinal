@@ -6,7 +6,7 @@
   <div class="p-6 m-6 bg-[#e7dbcb] rounded-xl shadow-md space-y-6">
     <h2 class="text-2xl font-bold text-gray-900 border-b pb-2">Editar Plan de Alimentación</h2>
 
-    <form action="{{ route('plans.update', $plan) }}" method="POST" class="space-y-6">
+    <form action="{{ route('plans.update', $plan) }}" method="POST" class="space-y-6 text-black">
         @csrf
         @method('PUT')
 

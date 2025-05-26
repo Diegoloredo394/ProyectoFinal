@@ -4,7 +4,7 @@
   </x-slot>
 
   <div class="m-6 p-6 bg-[#e7dbcb] rounded-xl shadow-md space-y-6">
-    <form action="{{ route('recipes.store') }}" method="POST" class="space-y-5">
+    <form action="{{ route('recipes.store') }}" method="POST" class="space-y-5 text-black">
         @csrf
 
         <!-- Nombre -->
