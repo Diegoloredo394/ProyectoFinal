@@ -109,29 +109,28 @@
   {{-- JavaScript de autocompletado dinámico --}}
   <script>
     let ingredientIndex = 1;
-function fetchSuggestions(query) {
-  if (query.length < 2) return;
+      const AUTO_URL = '{{ config("services.spoonacular.autocomplete_url") }}';
+  const API_KEY  = '{{ config("services.spoonacular.key") }}';
+  function fetchSuggestions(query) {
+    if (query.length < 2) return;
 
-  // Construye la URL de Spoonacular usando las vars VITE_ inyectadas por Vite
-  const url = `${import.meta.env.VITE_SPOONACULAR_AUTOCOMPLETE_URL}`
-      + `?query=${encodeURIComponent(query)}`
-      + `&number=10`
-      + `&apiKey=${import.meta.env.VITE_SPOONACULAR_KEY}`;
+    // Construye la URL final
+    const url = `${AUTO_URL}?query=${encodeURIComponent(query)}&number=10&apiKey=${API_KEY}`;
 
-  fetch(url)
-    .then(res => res.json())
-    .then(json => {
-      const dl = document.getElementById('ingredients-list');
-      dl.innerHTML = '';
-      // Spoonacular devuelve un array de objetos, extrae solo el nombre
-      (json || []).forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item.name;
-        dl.appendChild(opt);
-      });
-    })
-    .catch(() => console.warn('Error al obtener sugerencias'));
-}
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const dl = document.getElementById('ingredients-list');
+        dl.innerHTML = '';
+        // data aquí es un array de nombres (tu controller así lo devuelve)
+        data.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          dl.appendChild(opt);
+        });
+      })
+      .catch(() => console.warn('Error al obtener sugerencias'));
+  }
 
     function addIngredient() {
       const container = document.getElementById('ingredients');
