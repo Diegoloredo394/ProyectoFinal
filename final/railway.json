@@ -7,7 +7,6 @@
     "preDeployCommand": [
       "php artisan config:clear",
       "php artisan config:cache",
-      "php artisan migrate --force",
       "php artisan migrate --force --seed",
       "php artisan optimize",
       "chmod -R 777 storage bootstrap/cache"
