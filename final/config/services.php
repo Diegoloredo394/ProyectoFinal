@@ -35,12 +35,15 @@ return [
         ],
     ],
     
-  'spoonacular' => [
-    'key'               => env('SPOONACULAR_KEY'),
-    'autocomplete_url'  => env(
-      'SPOONACULAR_AUTOCOMPLETE_URL',
-      'https://api.spoonacular.com/food/ingredients/autocomplete'
+'spoonacular' => [
+    'key'             => env('SPOONACULAR_KEY'),
+    // URL base para cualquier otro endpoint de Spoonacular
+    'base_url'        => env('SPOONACULAR_API_URL', 'https://api.spoonacular.com'),
+    // URL concreta para el autocomplete
+    'autocomplete_url'=> env(
+        'SPOONACULAR_AUTOCOMPLETE_URL',
+        'https://api.spoonacular.com/food/ingredients/autocomplete'
     ),
-  ],
+],
 
 ];
