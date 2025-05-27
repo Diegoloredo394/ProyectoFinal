@@ -101,7 +101,7 @@
     list.innerHTML = '';
     if (!q) return;
     try {
-      const res = await axios.get('{{ url('ingredients/search') }}', {
+      const res = await axios.get('{{ secure_url('ingredients/search') }}', {
         params: { q }
       });
       res.data.forEach(item => {
