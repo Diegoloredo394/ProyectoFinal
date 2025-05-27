@@ -123,9 +123,9 @@
         const dl = document.getElementById('ingredients-list');
         dl.innerHTML = '';
         // data aquí es un array de nombres (tu controller así lo devuelve)
-        data.forEach(name => {
+        data.forEach(item => {
           const opt = document.createElement('option');
-          opt.value = name;
+          opt.value = item.name;
           dl.appendChild(opt);
         });
       })
