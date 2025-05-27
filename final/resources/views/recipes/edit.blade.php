@@ -104,9 +104,9 @@
       const res = await axios.get('{{ url('ingredients/search') }}', {
         params: { q }
       });
-      res.data.forEach(name => {
+      res.data.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = name;
+        opt.value = item.name;
         list.appendChild(opt);
       });
     } catch (e) {
